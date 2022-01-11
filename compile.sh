@@ -1,0 +1,1 @@
+g++ main.cpp glad.c -lglfw -lpthread -ldl -lassimp
