@@ -15,6 +15,7 @@ class Texture{
         stbi_set_flip_vertically_on_load(true);
         glGenTextures(1, &ID);
         glBindTexture(GL_TEXTURE_2D, ID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, repeat);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeat);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeat);
     

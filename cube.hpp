@@ -16,7 +16,7 @@ class Cube{
     Shader shader;
     Buffer buffer;
     Texture texture;
-    float size = 0.5f;
+    float size = 1.0f;
     Cube(glm::vec3 pos){
 
         std::vector<float> vertices = {

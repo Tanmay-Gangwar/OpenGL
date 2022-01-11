@@ -108,7 +108,9 @@ class Buffer{
     }
 
     void DrawTriangles(){
+        Bind();
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        Unbind();
     }
 };
 
