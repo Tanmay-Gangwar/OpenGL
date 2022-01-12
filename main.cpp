@@ -15,15 +15,23 @@
 const int SCR_WIDTH = 800;
 const int SCR_HEIGHT = 800;
 
+const float Spring_location = 7.0f;
+const int cubes_count = 50;
+
 glm::vec3 initial_cube_position = glm::vec3(3.0f, 0.0f, 0.0f);
-float initial_spring_length = 6.8f;
+float initial_spring_length = 2.8f;
 float m = 1.0f, c = 0.4f, k = 10.0f, delta_t = 0.01f;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
     glViewport(0, 0, width, height);
 }
 
+float rand(float l, float r){
+    return l + (r - l) * rand() / RAND_MAX;
+}
+
 int main(){
+    srand(0);
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -43,13 +51,21 @@ int main(){
 
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
-    Camera camera(glm::vec3(0.0f, 5.0f, 10.0f));
-    camera.view = glm::lookAt(camera.position, glm::vec3(0.0f, 0.0f, 0.0f), camera.globalUp);
-    Spring spring;
-    spring.model = glm::translate(spring.model, glm::vec3(-4.0f, 0.0f, 0.0f));
-    spring.length = initial_spring_length;
-    Cube cube(initial_cube_position);
-    Floor floor(glm::vec3(0.0f, 0.0f, 10.0f));
+    Camera camera(glm::vec3(0.0f, 0.0f, 15.0f));
+    // Spring spring(glm::vec3(0.0f, Spring_location, 0.0f), initial_spring_length);
+    // Cube cube(initial_cube_position);
+    std::vector<Cube> cubes;
+    for (int i = 0; i < cubes_count; i++){
+        cubes.push_back(Cube(rand(1.5f, 5.0f), rand(0.1f, 0.5f), glm::vec3(3.0f * (i - cubes_count / 2), -5.0f, rand(0.0f, -50.0f)), 0.0f));
+        // Cube(2.0f, 0.4f, glm::vec3(5.0f, -4.0f, 0.0f), 0.0f)
+    };
+
+    std::vector<Spring> springs;
+    for (int i = 0; i < cubes.size(); i++) {
+        springs.push_back(Spring(glm::vec3(cubes[i].position.x, Spring_location, cubes[i].position.z), fabs(Spring_location - cubes[i].position.y), rand(5.0f, 20.0f)));
+    }
+
+    Floor floor(glm::vec3(0.0f, Spring_location, 0.0f));
 
     glEnable(GL_DEPTH_TEST);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -66,11 +82,19 @@ int main(){
 
         view = camera.view;
         camera.processInputs(window);
-        spring.draw(view, projection);
-        spring.length = cube.position.x + 3.8f;
-        cube.Draw(view, projection);
+        for (Spring &spring: springs) spring.draw(view, projection);
+        // spring.length = cube.position.x + 3.8f;
+        for (Cube &cube: cubes) cube.Draw(view, projection);
         floor.Draw(view, projection);
-        if (start_simulation) cube.Simulate(m, c, k, delta_t);
+        if (start_simulation) {
+            // cube.Simulate(m, c, k, delta_t, glm::vec3(0.0f, 0.0f, 0.0f));
+            for (int i = 0; i < cubes.size(); i++){
+                cubes[i].Simulate(springs[i].k, delta_t);
+                springs[i].length = fabs(Spring_location - cubes[i].position.y);
+            }
+            // for (Cube &cube: cubes) cube.Simulate(k, delta_t);
+        }
+        // for (int i = 0; i < cubes.size(); i++) springs[i].length = fabs(Spring_location - cubes[i].position.y);
 
         glfwSwapBuffers(window);
     }

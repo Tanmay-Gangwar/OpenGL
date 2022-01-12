@@ -17,7 +17,9 @@ class Cube{
     Buffer buffer;
     Texture texture;
     float size = 1.0f;
-    Cube(glm::vec3 pos){
+    float m, c;
+    glm::vec3 mean_pos;
+    Cube(float m, float c, glm::vec3 pos, float mean_pos){
 
         std::vector<float> vertices = {
             -size / 2.0f, -size / 2.0f, -size / 2.0f,      0.0f, 0.0f,
@@ -69,6 +71,9 @@ class Cube{
         velocity = glm::vec3(0.0f, 0.0f, 0.0f);
         acceleration = glm::vec3(0.0f, 0.0f, 0.0f);
         model = glm::translate(position);
+        this->m = m;
+        this->c = c;
+        this->mean_pos = glm::vec3(position.x, mean_pos, position.z);
     }
 
     void Draw(glm::mat4 &view, glm::mat4 &projection){
@@ -80,17 +85,17 @@ class Cube{
         buffer.DrawTriangles();
     }
 
-    void Simulate(float m, float c, float k, float delta_t){
+    void Simulate(float k, float delta_t){
         // ma + cv + kx = 0;
         glm::vec3 delta_v = acceleration * delta_t;
         glm::vec3 delta_x = velocity * delta_t;
-        std::cerr << "Position: " << position.x << " " << position.y << " " << position.z << "\n";
-        std::cerr << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << "\n";
-        std::cerr << "acceleration: " << acceleration.x << " " << acceleration.y << " " << acceleration.z << "\n";
+        // std::cerr << "Position: " << position.x << " " << position.y << " " << position.z << "\n";
+        // std::cerr << "velocity: " << velocity.x << " " << velocity.y << " " << velocity.z << "\n";
+        // std::cerr << "acceleration: " << acceleration.x << " " << acceleration.y << " " << acceleration.z << "\n";
 
         velocity += delta_v;
         position += delta_x;
-        acceleration = - (k * position + c * velocity) / m;
+        acceleration = - (k * (position - mean_pos) + c * velocity) / m;
         model = glm::translate(model, delta_x);
     }
 };

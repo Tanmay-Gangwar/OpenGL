@@ -22,10 +22,10 @@ class Floor{
     Texture texture;
     Floor(glm::vec3 position){
         std::vector<float> vertices = {
-            -200.0f, -0.499f,    0.0f,      0.0f,   0.0f,
-             200.0f, -0.499f,    0.0f,      200.0f, 0.0f,
-            -200.0f, -0.499f, -200.0f,    0.0f,   200.0f,
-             200.0f, -0.499f, -200.0f,    200.0f, 200.0f
+            -200.0f, 0.0f,  200.0f,    0.0f,   0.0f,
+             200.0f, 0.0f,  200.0f,    400.0f, 0.0f,
+            -200.0f, 0.0f, -200.0f,    0.0f,   400.0f,
+             200.0f, 0.0f, -200.0f,    400.0f, 400.0f
         };
         std::vector<unsigned int> indices = {
             0, 1, 2,

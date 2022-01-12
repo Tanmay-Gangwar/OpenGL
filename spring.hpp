@@ -21,16 +21,17 @@ class Spring{
     float length = 1.0f;
     int linear_point_cnt = 1000;
     int circular_point_cnt = 10;
-    int number_spirals = 10;
+    int number_spirals = 20;
     float radius = 0.2f;
     Shader shader;
     unsigned int VBO, VAO;
     glm::mat4 model = glm::mat4(1.0f);
-    Spring(){
+    float k;
+    Spring(glm::vec3 position, float length, float k){
         std::vector<float> vertices;
         float theta = 0.0f;
         float x = 0.0f;
-        float delta_x = length / (linear_point_cnt - 1);
+        float delta_x = 1.0f / (linear_point_cnt - 1);
         float delta_theta = (2 * PI * number_spirals) / (linear_point_cnt - 1);
         for (int i = 0; i < linear_point_cnt - 1; i++){
             vertices.push_back(x);
@@ -45,7 +46,6 @@ class Spring{
         shader = Shader("spring.vert", "spring.frag");
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
-        // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
         glBindVertexArray(VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -53,6 +53,11 @@ class Spring{
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
+        this->length = length;
+        this->position = position;
+        model = glm::translate(model, position);
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+        this->k = k;
     }
 
     void draw(glm::mat4 &view, glm::mat4 &projection){
@@ -68,6 +73,4 @@ class Spring{
 
 };
 
-
-// (n - 1) * delta_theta = 2 * pi * number_spirals
 #endif
